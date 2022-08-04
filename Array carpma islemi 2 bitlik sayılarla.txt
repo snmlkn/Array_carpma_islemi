@@ -1,0 +1,68 @@
+-------------------------------------------------------------------------------
+2 bitlik sayı dizisinde array çarpma işlemi
+--------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_unsigned.all;
+
+entity uygulama3 is
+	Generic ( n: natural:=4 );
+	
+	Port(
+		clk: in std_logic;
+		rst: in std_logic;
+		s1: in std_logic_vector(n-1 downto 0);
+		s2: in std_logic_vector(n-1 downto 0);
+		son: out std_logic_vector(2*n-1 downto 0);
+	);	
+end uygulama3;
+
+architecture Behavioral of uygulama3 is
+		signal ta,tb: std_logic_vector(n-1 downto 0);
+		signal ts: std_logic_vector(2*n-1 downto 0):=(others => '0');
+		signal i: natural:=n;
+		signal sayac: natural: = 0;
+		signal durum: std_logic_vector(1 downto 0) := "00";
+Begin
+	process(clk,rst)
+	Begin
+		if rst='1' then
+			son <= (others => '0');
+			ts <= (others => '0');
+			durum <= "00";
+			i <= n;
+			sayac <= 0;
+		elsif rising_edge(clk) then
+			sayac <= sayac + 1;
+			case durum is
+				when "00"=>
+					ta <= s1;
+					tb <= s2;
+					durum <= "01";
+					
+				when "01"=>
+					i <= i-1;
+					if i>0 then
+						ts <= ts(2*n-2 downto 0) & '0';
+					end if;
+					durum <= "10";
+					
+				when "10"=>
+					if i>=0 then 
+						if tb(i)='1' then
+						ts <= ts + ta;
+						end if;
+						durum <= "01";
+					else	
+						durum <= "11";
+						
+					end if;
+					
+					
+				when others =>	
+					son <= ts;
+			end case;
+		end if;
+	end process;
+
+end Behavioral;
